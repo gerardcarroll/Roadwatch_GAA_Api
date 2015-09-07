@@ -1,0 +1,91 @@
+﻿using System.Diagnostics;
+using System.Reflection;
+using System.Xml.Linq;
+using MvcApplication2.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using Newtonsoft.Json;
+
+namespace MvcApplication2.Controllers
+{
+    public class FixtureController : ApiController
+    {
+        public List<Fixture> GetFixtures()
+        {
+            List<Fixture> fixtures = new List<Fixture>();
+            string date = DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)).ToString("yyyyMMdd");
+            string json = "";
+            string output = "";
+            string url =
+                "http://www.gaa.ie/iphone/feed_cache_json.php?fixturesOnly=Y&includeClubGames=N&owner=1&dateFrom=" + date + "&daysNext=31";
+
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    json = client.DownloadString(url);
+                }
+
+                if (json.Contains("null"))
+                {
+                    return fixtures;
+                }
+                output = json.Substring(json.IndexOf('['));
+                output = output.TrimEnd('}');
+                output = output.TrimEnd('}');
+
+                var matchTrack = JsonConvert.DeserializeObject<List<Fixture1>>(output);
+                foreach (var fixture1 in matchTrack)
+                {
+                    string refname = fixture1.referee_forename + " " + fixture1.referee_surname;
+                    if (refname == "{} {}")
+                    {
+                        refname = "";
+                        fixture1.referee_county = "";
+                    }
+                    string tv = fixture1.tv.ToString();
+                    if (tv == "{}")
+                    {
+                        tv = "";
+                    }
+                    string dt = "TBC";
+                    if (fixture1.date != "" && fixture1.date.Length >= 10)
+                    {
+                        dt = fixture1.date.Substring(0, Math.Min(fixture1.date.Length, 10));
+                    }
+                    
+                    Fixture fix = new Fixture
+                    {
+                        CompName = fixture1.competition_name,
+                        Date = dt,
+                        ExtraTime = Convert.ToBoolean(fixture1.extratime_playable),
+                        ID = Convert.ToInt32(fixture1.unique_id),
+                        Ref_County = fixture1.referee_county.ToString(),
+                        Ref_Name = refname,
+                        Replay = Convert.ToBoolean(fixture1.replay),
+                        Team_1 = fixture1.club_1_name,
+                        Team_2 = fixture1.club_2_name,
+                        Tv = tv,
+                        Venue = fixture1.venue_name,
+                        Time = fixture1.time
+                    };
+                    fixtures.Add(fix);
+                }
+            }
+            catch (Exception ex)
+            {
+                var sf = new StackFrame();
+                var methodBase = sf.GetMethod();
+                Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
+            }
+
+
+            return fixtures;
+
+        }
+    }
+}
