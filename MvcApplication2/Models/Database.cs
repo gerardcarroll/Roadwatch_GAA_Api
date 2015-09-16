@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Web;
 using MySql.Data.MySqlClient;
 
 namespace MvcApplication2.Models
 {
     public class Database
     {
-        #if DEBUG
-                private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
-        #else
+#if DEBUG
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+#else
                 private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
         #endif
 
@@ -24,7 +22,7 @@ namespace MvcApplication2.Models
             _connection.Open();
             return _connection;
         }
-        
+
         public static void Disconnect(MySqlConnection connection)
         {
             connection.Close();
@@ -35,7 +33,8 @@ namespace MvcApplication2.Models
         {
             _connection = Connect();
 
-            const string query = "INSERT INTO Api_Error (Method, Exception, Date_Time, Full_Ex) VALUES (@method, @exception, @date, @full);";
+            const string query =
+                "INSERT INTO Api_Error (Method, Exception, Date_Time, Full_Ex) VALUES (@method, @exception, @date, @full);";
 
             using (var cmd = new MySqlCommand(query, _connection))
             {
@@ -53,12 +52,12 @@ namespace MvcApplication2.Models
             {
                 EmailError(p1, p2, p3, "GAA API");
             }
-            
         }
+
         private static void EmailError(string s1, string s2, string s3, string s4)
         {
-            MailMessage m = new MailMessage();
-            SmtpClient SmtpServer = new SmtpClient("smtp1r.cp.blacknight.com");
+            var m = new MailMessage();
+            var SmtpServer = new SmtpClient("smtp1r.cp.blacknight.com");
             m.From = new MailAddress("apierror@selectunes.eu");
             m.To.Add("gcwpdev@gmail.com");
             m.Subject = s4 + " Error; " + DateTime.Now;
@@ -75,7 +74,8 @@ namespace MvcApplication2.Models
         {
             _connection = Connect();
 
-            const string query = "INSERT INTO Roadwatch_Api_Error (Method, Exception, DateTime, Full_Ex) VALUES (@method, @exception, @date, @full);";
+            const string query =
+                "INSERT INTO Roadwatch_Api_Error (Method, Exception, DateTime, Full_Ex) VALUES (@method, @exception, @date, @full);";
 
             using (var cmd = new MySqlCommand(query, _connection))
             {
@@ -90,11 +90,13 @@ namespace MvcApplication2.Models
             }
             EmailError(p1, p2, p3, "Roadwatch API");
         }
+
         public static void InsertPhoneErrorToDb(string p1, string p2, string p3)
         {
             _connection = Connect();
 
-            const string query = "INSERT INTO PhoneApp_Error (Method, Exception, Date_Time, Full_Ex) VALUES (@method, @exception, @date, @full);";
+            const string query =
+                "INSERT INTO PhoneApp_Error (Method, Exception, Date_Time, Full_Ex) VALUES (@method, @exception, @date, @full);";
 
             using (var cmd = new MySqlCommand(query, _connection))
             {
@@ -112,14 +114,14 @@ namespace MvcApplication2.Models
             {
                 EmailError(p1, p2, p3, "GAA Phone");
             }
-            
         }
 
         public static void InsertRoadwatchPhoneErrorToDb(string p1, string p2, string p3, string p4)
         {
             _connection = Connect();
 
-            const string query = "INSERT INTO Roadwatch_Phone_Error (Method, Exception, DateTime, Full_Ex) VALUES (@method, @exception, @date, @full);";
+            const string query =
+                "INSERT INTO Roadwatch_Phone_Error (Method, Exception, DateTime, Full_Ex) VALUES (@method, @exception, @date, @full);";
 
             using (var cmd = new MySqlCommand(query, _connection))
             {
@@ -136,6 +138,5 @@ namespace MvcApplication2.Models
 
             EmailError(p1, p2, p3, "Roadwatch Phone");
         }
-
     }
 }

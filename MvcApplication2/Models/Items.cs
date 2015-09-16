@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace MvcApplication2.Models
 {
@@ -12,6 +9,5 @@ namespace MvcApplication2.Models
         public String Title { get; set; }
         public Thumbnail Thumbnail { get; set; }
         public Int32 Duration { get; set; }
-
     }
 }

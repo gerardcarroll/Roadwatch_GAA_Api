@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using HtmlAgilityPack;
@@ -15,12 +13,13 @@ namespace MvcApplication2.Controllers
 {
     public class ImageController : ApiController
     {
-        #if DEBUG
-                private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
-        #else
+#if DEBUG
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+#else
                     private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
         #endif
-        readonly MySqlConnection _connection = new MySqlConnection(ConnectionString);
+        private readonly MySqlConnection _connection = new MySqlConnection(ConnectionString);
 
         public IEnumerable<AppImage> GetImagesFromDb(string title, string link)
         {
@@ -32,7 +31,7 @@ namespace MvcApplication2.Controllers
                 _connection.Open();
 
                 var sql = string.Format("SELECT Location, Abstract from Image " +
-                    "where Title = '{0}' order by ID", title);
+                                        "where Title = '{0}' order by ID", title);
 
                 using (var cmd = new MySqlCommand(sql, _connection))
                 {
@@ -43,10 +42,10 @@ namespace MvcApplication2.Controllers
                             while (r.Read())
                             {
                                 var img = new AppImage
-                                          {
-                                              URL = r.GetString("Location"),
-                                              Abstract = r.GetString("Abstract")
-                                          };
+                                {
+                                    URL = r.GetString("Location"),
+                                    Abstract = r.GetString("Abstract")
+                                };
                                 images.Add(img);
                             }
                         }
@@ -64,7 +63,6 @@ namespace MvcApplication2.Controllers
                     //now get them and send back to phone
                     images = GetNewImages(title);
                 }
-
             }
             catch (Exception ex)
             {
@@ -85,7 +83,7 @@ namespace MvcApplication2.Controllers
             var images = new List<AppImage>();
 
             var sql = string.Format("SELECT * from Image " +
-                    "where Title = '{0}' order by ID", title);
+                                    "where Title = '{0}' order by ID", title);
 
             try
             {
@@ -96,11 +94,11 @@ namespace MvcApplication2.Controllers
                         while (r.Read())
                         {
                             var img = new AppImage
-                                      {
-                                          Abstract = r.GetString("Abstract"),
-                                          Title = r.GetString("Title"),
-                                          URL = r.GetString("Location")
-                                      };
+                            {
+                                Abstract = r.GetString("Abstract"),
+                                Title = r.GetString("Title"),
+                                URL = r.GetString("Location")
+                            };
                             images.Add(img);
                         }
                     }
@@ -130,7 +128,7 @@ namespace MvcApplication2.Controllers
                 foreach (var node in nodes)
                 {
                     if (node.Name != "a") continue;
-                    var image = new AppImage { Title = title };
+                    var image = new AppImage {Title = title};
                     var decodedString = WebUtility.HtmlDecode(node.InnerHtml);
                     image.Abstract = Regex.Replace(decodedString,
                         @"\t|\n|\r", "");
@@ -155,7 +153,6 @@ namespace MvcApplication2.Controllers
                         images.Add(image);
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -168,7 +165,8 @@ namespace MvcApplication2.Controllers
             {
                 foreach (var img in images)
                 {
-                    const string query = "INSERT INTO Image (Title, Location, Abstract) VALUES (@title, @location, @abstract);";
+                    const string query =
+                        "INSERT INTO Image (Title, Location, Abstract) VALUES (@title, @location, @abstract);";
 
                     using (var cmd = new MySqlCommand(query, _connection))
                     {
@@ -188,7 +186,6 @@ namespace MvcApplication2.Controllers
                 var methodBase = stackFrame.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-
         }
     }
 }

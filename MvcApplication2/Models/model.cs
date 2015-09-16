@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace MvcApplication2.Models
 {
@@ -12,12 +9,10 @@ namespace MvcApplication2.Models
 
     public class County1
     {
-
     }
 
     public class County2
     {
-
     }
 
     public class Sections

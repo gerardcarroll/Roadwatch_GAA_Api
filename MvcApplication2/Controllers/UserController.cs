@@ -1,10 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Web.Http;
 using MvcApplication2.Models;
 using MySql.Data.MySqlClient;
@@ -13,36 +8,37 @@ namespace MvcApplication2.Controllers
 {
     public class UserController : ApiController
     {
-        #if DEBUG
-            private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
-        #else
+#if DEBUG
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+#else
             private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
         #endif
 
         private static MySqlConnection _connection;
-        private bool _newUser = false;
-        bool updateTimes = false;
-        
-        string lastDate = "";
-        private int dayTotal = 0;
+        private bool _newUser;
+        private bool updateTimes;
+
+        private string lastDate = "";
+        private int dayTotal;
 
         // GET api/user
         public String GetPhoneUsers(string id)
         {
-            int i = 0;
+            var i = 0;
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
-                
 
-                string query = string.Format("SELECT * from WP_GAA_Users where Unique_ID like '{0}';", id);
+
+                var query = string.Format("SELECT * from WP_GAA_Users where Unique_ID like '{0}';", id);
 
                 using (_connection)
                 {
                     _connection.Open();
                     using (var cmd = new MySqlCommand(query, _connection))
                     {
-                        using (MySqlDataReader r = cmd.ExecuteReader())
+                        using (var r = cmd.ExecuteReader())
                         {
                             if (!r.HasRows)
                             {
@@ -59,7 +55,7 @@ namespace MvcApplication2.Controllers
                         }
                     }
                 }
-                
+
                 if (updateTimes)
                 {
                     UpdateTimesUsed(i, id);
@@ -72,23 +68,24 @@ namespace MvcApplication2.Controllers
 
                 UpdateCountToday();
             }
-            
+
             catch (Exception ex)
             {
                 var sf = new StackFrame();
-                MethodBase methodBase = sf.GetMethod();
+                var methodBase = sf.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-            
+
             return "1602";
         }
 
-        
+
         private void UpdateTimesUsed(int i, string id)
         {
             try
             {
-                string query = "UPDATE WP_GAA_Users SET Times_Used='" + i + "', Last_Used= '" + DateTime.Now + "' WHERE Unique_ID = '" + id + "' ;";
+                var query = "UPDATE WP_GAA_Users SET Times_Used='" + i + "', Last_Used= '" + DateTime.Now +
+                            "' WHERE Unique_ID = '" + id + "' ;";
 
                 using (_connection)
                 {
@@ -98,7 +95,6 @@ namespace MvcApplication2.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-                
             }
             catch (Exception ex)
             {
@@ -107,12 +103,13 @@ namespace MvcApplication2.Controllers
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
         }
-        
+
         private static void InsertUser(string id)
         {
             try
             {
-                const string query = "INSERT INTO WP_GAA_Users (Unique_ID, Date_Entered, Times_Used) VALUES (@id, @date, @times);";
+                const string query =
+                    "INSERT INTO WP_GAA_Users (Unique_ID, Date_Entered, Times_Used) VALUES (@id, @date, @times);";
 
                 using (_connection)
                 {
@@ -129,7 +126,6 @@ namespace MvcApplication2.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-                
             }
             catch (Exception ex)
             {
@@ -137,28 +133,27 @@ namespace MvcApplication2.Controllers
                 var methodBase = sf.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-            
         }
 
         public String GetPhoneUsersWitModel(string id, string model)
         {
-            bool modelNull = false;
-            string lastLogin = "";
-            
-            int i = 0;
+            var modelNull = false;
+            var lastLogin = "";
+
+            var i = 0;
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
-                
 
-                string query = string.Format("SELECT * from WP_GAA_Users where Unique_ID like '{0}';", id);
+
+                var query = string.Format("SELECT * from WP_GAA_Users where Unique_ID like '{0}';", id);
 
                 using (_connection)
                 {
                     _connection.Open();
                     using (var cmd = new MySqlCommand(query, _connection))
                     {
-                        using (MySqlDataReader r = cmd.ExecuteReader())
+                        using (var r = cmd.ExecuteReader())
                         {
                             if (!r.HasRows)
                             {
@@ -174,14 +169,14 @@ namespace MvcApplication2.Controllers
                                         modelNull = true;
                                     }
                                     i = r.GetInt32("Times_Used") + 1;
-                                    
+
                                     updateTimes = true;
                                 }
                             }
                         }
                     }
                 }
-                
+
                 if (updateTimes)
                 {
                     UpdateTimesUsed(i, id);
@@ -195,19 +190,19 @@ namespace MvcApplication2.Controllers
                 {
                     InsertModel(model, id);
                 }
-                if (id != "59AC8239E2CE2B6116A00549986CBBF58DB700D0" && id != "92A0CB490AFA78C63723C921090648D9050575B2" && id != "747B38EBCF294EA96067C8312455CAA7344C3ADB" && model != "Microsoft XDeviceEmulator")
+                if (id != "59AC8239E2CE2B6116A00549986CBBF58DB700D0" && id != "92A0CB490AFA78C63723C921090648D9050575B2" &&
+                    id != "747B38EBCF294EA96067C8312455CAA7344C3ADB" && model != "Microsoft XDeviceEmulator")
                 {
                     UpdateCountToday();
                 }
-                
             }
             catch (Exception ex)
             {
                 var sf = new StackFrame();
-                MethodBase methodBase = sf.GetMethod();
+                var methodBase = sf.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-            
+
             return "1602";
         }
 
@@ -215,7 +210,7 @@ namespace MvcApplication2.Controllers
         {
             try
             {
-                string query = "UPDATE WP_GAA_Users SET Model= '" + model + "' WHERE Unique_ID = '" + id + "' ;";
+                var query = "UPDATE WP_GAA_Users SET Model= '" + model + "' WHERE Unique_ID = '" + id + "' ;";
 
                 using (_connection)
                 {
@@ -225,7 +220,6 @@ namespace MvcApplication2.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-                
             }
             catch (Exception ex)
             {
@@ -239,7 +233,8 @@ namespace MvcApplication2.Controllers
         {
             try
             {
-                const string query = "INSERT INTO WP_GAA_Users (Unique_ID, Date_Entered, Model, Times_Used) VALUES (@id, @date, @model, @times);";
+                const string query =
+                    "INSERT INTO WP_GAA_Users (Unique_ID, Date_Entered, Model, Times_Used) VALUES (@id, @date, @model, @times);";
 
                 using (_connection)
                 {
@@ -256,7 +251,6 @@ namespace MvcApplication2.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-                
             }
             catch (Exception ex)
             {
@@ -264,19 +258,19 @@ namespace MvcApplication2.Controllers
                 var methodBase = sf.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-
         }
 
         private void UpdateCountToday()
         {
-            int lastTotal = 0;
-            int count = GetCount();
+            var lastTotal = 0;
+            var count = GetCount();
             try
             {
                 if (count == 0)
                 {
                     count++;
-                    string query = "UPDATE GAAUsersToday SET Count='" + count + "', Date='" + DateTime.Now.ToShortDateString() + "' WHERE Id = 1 ;";
+                    var query = "UPDATE GAAUsersToday SET Count='" + count + "', Date='" +
+                                DateTime.Now.ToShortDateString() + "' WHERE Id = 1 ;";
 
                     using (_connection)
                     {
@@ -293,7 +287,7 @@ namespace MvcApplication2.Controllers
                         _connection.Open();
                         using (var cmd = new MySqlCommand(query, _connection))
                         {
-                            using (MySqlDataReader r = cmd.ExecuteReader())
+                            using (var r = cmd.ExecuteReader())
                             {
                                 while (r.Read())
                                 {
@@ -304,7 +298,8 @@ namespace MvcApplication2.Controllers
                     }
                     if (dayTotal > lastTotal)
                     {
-                        query = "UPDATE GAAUsersToday SET Count='" + dayTotal + "', Date='" + lastDate + "' WHERE Id = 2 ;";
+                        query = "UPDATE GAAUsersToday SET Count='" + dayTotal + "', Date='" + lastDate +
+                                "' WHERE Id = 2 ;";
                         using (_connection)
                         {
                             _connection.Open();
@@ -314,12 +309,11 @@ namespace MvcApplication2.Controllers
                             }
                         }
                     }
-                    
                 }
                 else
                 {
                     count++;
-                    string query = "UPDATE GAAUsersToday SET Count='" + count + "' WHERE Id = 1 ;";
+                    var query = "UPDATE GAAUsersToday SET Count='" + count + "' WHERE Id = 1 ;";
 
                     using (_connection)
                     {
@@ -330,30 +324,30 @@ namespace MvcApplication2.Controllers
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
                 var sf = new StackFrame();
-                MethodBase methodBase = sf.GetMethod();
+                var methodBase = sf.GetMethod();
                 Database.InsertRoadwatchErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
         }
+
         private int GetCount()
         {
-            int i = 0;
+            var i = 0;
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
-                
-                string query = "SELECT * from GAAUsersToday Where Id = 1 ;";
+
+                var query = "SELECT * from GAAUsersToday Where Id = 1 ;";
 
                 using (_connection)
                 {
                     _connection.Open();
                     using (var cmd = new MySqlCommand(query, _connection))
                     {
-                        using (MySqlDataReader r = cmd.ExecuteReader())
+                        using (var r = cmd.ExecuteReader())
                         {
                             while (r.Read())
                             {
@@ -363,17 +357,15 @@ namespace MvcApplication2.Controllers
                         }
                     }
                 }
-               
             }
             catch (Exception ex)
             {
                 var sf = new StackFrame();
-                MethodBase methodBase = sf.GetMethod();
+                var methodBase = sf.GetMethod();
                 Database.InsertRoadwatchErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
             dayTotal = i;
             return DateTime.Parse(lastDate).ToShortDateString() == DateTime.Now.ToShortDateString() ? i : 0;
         }
-
     }
 }

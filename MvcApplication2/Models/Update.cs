@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace MvcApplication2.Models
 {
@@ -10,6 +8,5 @@ namespace MvcApplication2.Models
         public String Time { get; set; }
         public List<String> Text { get; set; }
         public String Score { get; set; }
-    
     }
 }

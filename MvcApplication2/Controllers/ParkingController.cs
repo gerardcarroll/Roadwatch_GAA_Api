@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using HtmlAgilityPack;
@@ -14,25 +13,26 @@ namespace MvcApplication2.Controllers
 {
     public class ParkingController : ApiController
     {
-        #if DEBUG
-                private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
-        #else
+#if DEBUG
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+#else
                     private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
         #endif
-        MySqlConnection _connection;
+        private MySqlConnection _connection;
         private string openingHours = "";
         private string tariffs = "";
 
         public List<ParkingCity> GetCities()
         {
-            List<ParkingCity> cities = new List<ParkingCity>();
+            var cities = new List<ParkingCity>();
 
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
                 _connection.Open();
 
-                string sql = string.Format("SELECT * from Roadwatch_Parking_City ");
+                var sql = string.Format("SELECT * from Roadwatch_Parking_City ");
 
                 using (var cmd = new MySqlCommand(sql, _connection))
                 {
@@ -40,11 +40,11 @@ namespace MvcApplication2.Controllers
                     {
                         while (r.Read())
                         {
-                            ParkingCity city = new ParkingCity
-                                               {
-                                                   Id = r.GetInt32("Id"),
-                                                   Name = r.GetString("Name")
-                                               };
+                            var city = new ParkingCity
+                            {
+                                Id = r.GetInt32("Id"),
+                                Name = r.GetString("Name")
+                            };
                             cities.Add(city);
                         }
                     }
@@ -62,15 +62,15 @@ namespace MvcApplication2.Controllers
 
         public List<Carpark> GetCarparks(string name, int id)
         {
-            List<Carpark> carparks = new List<Carpark>();
-            bool recent = true;
-            bool getThem = false;
+            var carparks = new List<Carpark>();
+            var recent = true;
+            var getThem = false;
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
                 _connection.Open();
 
-                string sql = string.Format("SELECT * from Roadwatch_Parking where City = '{0}' ", name);
+                var sql = string.Format("SELECT * from Roadwatch_Parking where City = '{0}' ", name);
 
                 using (var cmd = new MySqlCommand(sql, _connection))
                 {
@@ -85,19 +85,19 @@ namespace MvcApplication2.Controllers
                                 //    recent = false;
                                 //    break;
                                 //}
-                                Carpark cp = new Carpark
-                                             {
-                                                 Access = r.GetString("Access"),
-                                                 City = r.GetString("City"),
-                                                 CityId = r.GetInt32("City_Id"),
-                                                 District = r.GetString("District"),
-                                                 Hours = r.GetString("Hours"),
-                                                 Id = r.GetInt32("Id"),
-                                                 Location = r.GetString("Location"),
-                                                 Name = r.GetString("Name"),
-                                                 Tarrifs = r.GetString("Tarriffs"),
-                                                 Url = r.GetString("Url")
-                                             };
+                                var cp = new Carpark
+                                {
+                                    Access = r.GetString("Access"),
+                                    City = r.GetString("City"),
+                                    CityId = r.GetInt32("City_Id"),
+                                    District = r.GetString("District"),
+                                    Hours = r.GetString("Hours"),
+                                    Id = r.GetInt32("Id"),
+                                    Location = r.GetString("Location"),
+                                    Name = r.GetString("Name"),
+                                    Tarrifs = r.GetString("Tarriffs"),
+                                    Url = r.GetString("Url")
+                                };
                                 carparks.Add(cp);
                             }
                         }
@@ -105,7 +105,6 @@ namespace MvcApplication2.Controllers
                         {
                             getThem = true;
                         }
-                        
                     }
                 }
             }
@@ -124,12 +123,12 @@ namespace MvcApplication2.Controllers
 
                 var nodes = doc.DocumentNode.SelectNodes("//div[@class='parkingList']");
 
-                foreach (HtmlNode node in nodes)
+                foreach (var node in nodes)
                 {
-                    var parks = node.ChildNodes[3].ChildNodes[3].ChildNodes;//.SelectNodes("//tr");
-                    foreach (HtmlNode n in parks.Where(p => p.Name == "tr"))
+                    var parks = node.ChildNodes[3].ChildNodes[3].ChildNodes; //.SelectNodes("//tr");
+                    foreach (var n in parks.Where(p => p.Name == "tr"))
                     {
-                        Carpark cp = new Carpark();
+                        var cp = new Carpark();
                         cp.District = CleanString(node.ChildNodes[1].InnerText);
                         cp.Name = CleanString(n.ChildNodes[1].InnerText);
                         cp.Location = CleanString(n.ChildNodes[3].InnerText);
@@ -146,7 +145,7 @@ namespace MvcApplication2.Controllers
 
                 if (carparks.Count > 0)
                 {
-                    foreach (Carpark cp in carparks)
+                    foreach (var cp in carparks)
                     {
                         //InsertCarparkToDb(cp);
                     }
@@ -154,7 +153,7 @@ namespace MvcApplication2.Controllers
 
                 GetCarparks(name, id);
             }
-            
+
             return carparks;
         }
 
@@ -178,8 +177,9 @@ namespace MvcApplication2.Controllers
 
             try
             {
-                const string query = "INSERT INTO Roadwatch_Parking (City, District, Name, Location, Url, Access, Hours, Tarriffs, City_Id, Updated)" +
-                                     " VALUES (@city, @district, @name, @location, @url, @access, @hours, @tarriffs, @cityid, @updated);";
+                const string query =
+                    "INSERT INTO Roadwatch_Parking (City, District, Name, Location, Url, Access, Hours, Tarriffs, City_Id, Updated)" +
+                    " VALUES (@city, @district, @name, @location, @url, @access, @hours, @tarriffs, @cityid, @updated);";
 
                 using (var cmd = new MySqlCommand(query, _connection))
                 {
@@ -205,24 +205,23 @@ namespace MvcApplication2.Controllers
                 var methodBase = sf.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-
         }
 
         private string GetDetails(string p)
         {
-            string access = "";
+            var access = "";
             openingHours = "";
             tariffs = "";
             var web = new HtmlWeb();
             var doc = web.Load(p);
             var nodes = doc.DocumentNode.SelectNodes("//table[@class='parkingTable']");
-            foreach (HtmlNode node in nodes.Where(n => n.Name == "table"))
+            foreach (var node in nodes.Where(n => n.Name == "table"))
             {
                 access = node.ChildNodes[3].ChildNodes[3].ChildNodes[3].InnerHtml;
                 openingHours = node.ChildNodes[3].ChildNodes[5].ChildNodes[3].InnerHtml;
                 tariffs = node.ChildNodes[3].ChildNodes[7].ChildNodes[3].InnerHtml;
             }
-            
+
             return access;
         }
     }

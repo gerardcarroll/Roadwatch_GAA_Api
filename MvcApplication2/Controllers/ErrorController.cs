@@ -1,11 +1,8 @@
-﻿using System.Net.Mail;
-using MvcApplication2.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net;
-using System.Net.Http;
+using System.Net.Mail;
 using System.Web.Http;
+using MvcApplication2.Models;
 
 namespace MvcApplication2.Controllers
 {
@@ -23,8 +20,8 @@ namespace MvcApplication2.Controllers
 
         private void EmailError(string s1, string s2, string s3)
         {
-            MailMessage m = new MailMessage();
-            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+            var m = new MailMessage();
+            var SmtpServer = new SmtpClient("smtp.gmail.com");
             m.From = new MailAddress("gercarroll@gmail.com");
             m.To.Add("gcwpdev@gmail.com");
             m.Subject = "GAA App Error Phone" + DateTime.Now;
@@ -35,6 +32,5 @@ namespace MvcApplication2.Controllers
 
             SmtpServer.Send(m);
         }
-
     }
 }

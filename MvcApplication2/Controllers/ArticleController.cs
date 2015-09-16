@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Web.Http;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using Microsoft.ApplicationInsights;
 using MvcApplication2.Models;
@@ -20,7 +16,8 @@ namespace MvcApplication2.Controllers
     public class ArticleController : ApiController
     {
 #if DEBUG
-        private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
 #else
             private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
 #endif
@@ -32,8 +29,7 @@ namespace MvcApplication2.Controllers
             var tc = new TelemetryClient();
             tc.TrackEvent("ArticlesPageHit");
 
-            Articles newArticles;
-            List<Article1> articles = new List<Article1>();
+            var articles = new List<Article1>();
             try
             {
                 //newArticles = GetXmlArticles();
@@ -59,27 +55,26 @@ namespace MvcApplication2.Controllers
                 //}
 
                 //To change comment from here
-                List<Article1> articlesNotInDb = new List<Article1>();
-                List<Article1> articlesInDb = new List<Article1>();
-                string json = "";
-                string newCode = "";
-                
-                    using (var client = new WebClient())
-                    {
-                        json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
+                var articlesNotInDb = new List<Article1>();
+                var articlesInDb = new List<Article1>();
+                var json = "";
+                var newCode = "";
 
-                    }
-                    json = json.Replace("@attributes", "attributes");
-                    json = json.Remove(0, 11);
-                    json = json.TrimEnd('}');
-                    var articless = JsonConvert.DeserializeObject<List<Article>>(json);
+                using (var client = new WebClient())
+                {
+                    json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
+                }
+                json = json.Replace("@attributes", "attributes");
+                json = json.Remove(0, 11);
+                json = json.TrimEnd('}');
+                var articless = JsonConvert.DeserializeObject<List<Article>>(json);
 
 
                 foreach (var a in articless)
                 {
                     if (a.newsid != "12370")
                     {
-                        bool isFootball = false;
+                        var isFootball = false;
                         foreach (var sec in a.sections.section_id)
                         {
                             if (sec == "13")
@@ -109,11 +104,12 @@ namespace MvcApplication2.Controllers
                             }
                         }
                         a.filename = a.filename.Replace("http:", "");
-                        if (a.title.StartsWith("LIVE:") || a.title.Contains("Live!") || a.title.Contains("LIVE!") || a.title.EndsWith("as it happens"))
+                        if (a.title.StartsWith("LIVE:") || a.title.Contains("Live!") || a.title.Contains("LIVE!") ||
+                            a.title.EndsWith("as it happens"))
                         {
                             InsertUpdateToDb(a.newsid);
                         }
-                        Article1 article = new Article1
+                        var article = new Article1
                         {
                             content_image_id = a.content_image_id,
                             content_text_id = a.content_text_id,
@@ -127,7 +123,7 @@ namespace MvcApplication2.Controllers
                         };
                         articles.Add(article);
                     }
-                }                           //To Here
+                } //To Here
 
                 //Get Articles from DB
                 articlesInDb = GetArticlesFromDb();
@@ -135,8 +131,8 @@ namespace MvcApplication2.Controllers
                 foreach (var article1 in articles)
                 {
                     var q = (from ar in articlesInDb
-                             where ar.ID == article1.ID
-                             select ar).FirstOrDefault();
+                        where ar.ID == article1.ID
+                        select ar).FirstOrDefault();
                     if (q != null)
                     {
                         article1.upload_date = q.upload_date;
@@ -156,11 +152,7 @@ namespace MvcApplication2.Controllers
                 //if new save to db
                 SaveToDb(articlesNotInDb);
 
-                foreach (var article1 in articlesNotInDb)
-                {
-                    articles.Add(article1);
-                }
-
+                articles.AddRange(articlesNotInDb);
             }
             catch (Exception ex)
             {
@@ -169,7 +161,7 @@ namespace MvcApplication2.Controllers
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
 
-            return articles.OrderByDescending(a => a.ID).Take(30);
+            return articles.OrderByDescending(a => a.ID).Take(25);
         }
 
         private void SaveToDb(List<Article1> articlesNotInDb)
@@ -194,7 +186,6 @@ namespace MvcApplication2.Controllers
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -206,23 +197,23 @@ namespace MvcApplication2.Controllers
 
         private List<Article1> GetArticlesFromDb()
         {
-            List<Article1> articles = new List<Article1>();
+            var articles = new List<Article1>();
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
 
-                string query = "SELECT * from GAA_Article order by Id desc Limit 50;";
+                var query = "SELECT * from GAA_Article order by Id desc Limit 50;";
 
                 using (_connection)
                 {
                     _connection.Open();
                     using (var cmd = new MySqlCommand(query, _connection))
                     {
-                        using (MySqlDataReader r = cmd.ExecuteReader())
+                        using (var r = cmd.ExecuteReader())
                         {
                             while (r.Read())
                             {
-                                Article1 article = new Article1();
+                                var article = new Article1();
                                 article.ID = Convert.ToInt32(r.GetString("Id"));
                                 article.upload_date = DateTime.Parse(r.GetString("Upload_Date"));
                                 articles.Add(article);
@@ -243,16 +234,15 @@ namespace MvcApplication2.Controllers
 
         public IEnumerable<Article1> GetArticlesWithTime(string lastLogin)
         {
-            List<Article1> articles = new List<Article1>();
-            string json = "";
-            string newCode = "Uploaded: ";
-            
+            var articles = new List<Article1>();
+            var json = "";
+            var newCode = "Uploaded: ";
+
             try
             {
                 using (var client = new WebClient())
                 {
                     json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
-
                 }
                 json = json.Replace("@attributes", "attributes");
                 json = json.Remove(0, 11);
@@ -261,7 +251,7 @@ namespace MvcApplication2.Controllers
 
                 foreach (var a in articless)
                 {
-                    bool isFootball = false;
+                    var isFootball = false;
                     //bool isHurling = false;
                     foreach (var sec in a.sections.section_id)
                     {
@@ -292,15 +282,15 @@ namespace MvcApplication2.Controllers
                         //    newCode = "Top Daily";
                         //    break;
                         //}
-                        
-                       // newCode = "General";
+
+                        // newCode = "General";
                     }
                     a.filename = a.filename.Replace("http:", "");
                     if (a.title.StartsWith("LIVE:") || a.title.Contains("Live!"))
                     {
                         InsertUpdateToDb(a.newsid);
                     }
-                    Article1 article = new Article1
+                    var article = new Article1
                     {
                         content_image_id = a.content_image_id,
                         content_text_id = a.content_text_id,
@@ -314,7 +304,6 @@ namespace MvcApplication2.Controllers
                         New = false
                     };
                     articles.Add(article);
-
                 }
             }
             catch (Exception ex)
@@ -341,7 +330,8 @@ namespace MvcApplication2.Controllers
             {
                 _connection = new MySqlConnection(ConnectionString);
                 _connection.Open();
-                string query = "UPDATE db1305421_wpdev.UpdateTbl SET UpdateID='" + p + "', Date= '" + DateTime.Now + "' WHERE Id = 1 ;";
+                var query = "UPDATE db1305421_wpdev.UpdateTbl SET UpdateID='" + p + "', Date= '" + DateTime.Now +
+                            "' WHERE Id = 1 ;";
 
                 using (var cmd = new MySqlCommand(query, _connection))
                 {
@@ -362,16 +352,13 @@ namespace MvcApplication2.Controllers
 
         private Articles GetXmlArticles()
         {
-            XmlSerializer ser = new XmlSerializer(typeof(Articles));
+            var ser = new XmlSerializer(typeof (Articles));
             Articles articles;
-            using (XmlReader reader = XmlReader.Create("http://www.gaa.ie/iphone/get_news_xml.php?section=1"))
+            using (var reader = XmlReader.Create("http://www.gaa.ie/iphone/get_news_xml.php?section=1"))
             {
-                articles = (Articles)ser.Deserialize(reader);
+                articles = (Articles) ser.Deserialize(reader);
             }
             return articles;
         }
-
     }
-
-
 }

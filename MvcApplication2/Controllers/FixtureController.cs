@@ -1,13 +1,9 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Xml.Linq;
-using MvcApplication2.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
+using MvcApplication2.Models;
 using Newtonsoft.Json;
 
 namespace MvcApplication2.Controllers
@@ -16,12 +12,13 @@ namespace MvcApplication2.Controllers
     {
         public List<Fixture> GetFixtures()
         {
-            List<Fixture> fixtures = new List<Fixture>();
-            string date = DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)).ToString("yyyyMMdd");
-            string json = "";
-            string output = "";
-            string url =
-                "http://www.gaa.ie/iphone/feed_cache_json.php?fixturesOnly=Y&includeClubGames=N&owner=1&dateFrom=" + date + "&daysNext=31";
+            var fixtures = new List<Fixture>();
+            var date = DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)).ToString("yyyyMMdd");
+            var json = "";
+            var output = "";
+            var url =
+                "http://www.gaa.ie/iphone/feed_cache_json.php?fixturesOnly=Y&includeClubGames=N&owner=1&dateFrom=" +
+                date + "&daysNext=31";
 
             try
             {
@@ -41,24 +38,24 @@ namespace MvcApplication2.Controllers
                 var matchTrack = JsonConvert.DeserializeObject<List<Fixture1>>(output);
                 foreach (var fixture1 in matchTrack)
                 {
-                    string refname = fixture1.referee_forename + " " + fixture1.referee_surname;
+                    var refname = fixture1.referee_forename + " " + fixture1.referee_surname;
                     if (refname == "{} {}")
                     {
                         refname = "";
                         fixture1.referee_county = "";
                     }
-                    string tv = fixture1.tv.ToString();
+                    var tv = fixture1.tv.ToString();
                     if (tv == "{}")
                     {
                         tv = "";
                     }
-                    string dt = "TBC";
+                    var dt = "TBC";
                     if (fixture1.date != "" && fixture1.date.Length >= 10)
                     {
                         dt = fixture1.date.Substring(0, Math.Min(fixture1.date.Length, 10));
                     }
-                    
-                    Fixture fix = new Fixture
+
+                    var fix = new Fixture
                     {
                         CompName = fixture1.competition_name,
                         Date = dt,
@@ -85,7 +82,6 @@ namespace MvcApplication2.Controllers
 
 
             return fixtures;
-
         }
     }
 }

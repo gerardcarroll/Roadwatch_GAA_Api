@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using HtmlAgilityPack;
 using MvcApplication2.Models;
@@ -14,21 +13,21 @@ namespace MvcApplication2.Controllers
     {
         public List<SummaryBlock> GetSummaryBlocks()
         {
-            List<SummaryBlock> blocks = new List<SummaryBlock>();
+            var blocks = new List<SummaryBlock>();
             var web = new HtmlWeb();
             const string link = "http://www.theaa.ie/AA/AA-Roadwatch.aspx";
-            string d = "";
-            string para = "";
-            bool updateTime = false;
+            var d = "";
+            var para = "";
+            var updateTime = false;
             try
             {
                 var doc = web.Load(link);
                 var nodes = doc.DocumentNode.SelectNodes("//div[@class='mainTrafficReport']").Descendants();
-                List<String> paraList = new List<String>();
-                SummaryBlock sb = new SummaryBlock();
+                var paraList = new List<String>();
+                var sb = new SummaryBlock();
                 foreach (var node in nodes.Where(n => n.Name == "#text"))
                 {
-                    string innerTrimmed = WebUtility.HtmlDecode(node.InnerText).Trim();
+                    var innerTrimmed = WebUtility.HtmlDecode(node.InnerText).Trim();
                     if (updateTime)
                     {
                         sb = new SummaryBlock();
@@ -153,7 +152,7 @@ namespace MvcApplication2.Controllers
                                     {
                                         if (d.StartsWith(":") || d.StartsWith(" :"))
                                         {
-                                            int index = d.IndexOf(":", StringComparison.Ordinal);
+                                            var index = d.IndexOf(":", StringComparison.Ordinal);
                                             d = (index < 0) ? d : d.Remove(index, 1);
                                             d = d.Trim();
                                         }
@@ -174,13 +173,11 @@ namespace MvcApplication2.Controllers
                             break;
                         }
                     }
-
                 }
 
                 paraList.Add(para);
                 sb.Paragraph = paraList;
                 blocks.Add(sb);
-
             }
             catch (Exception ex)
             {
@@ -193,7 +190,7 @@ namespace MvcApplication2.Controllers
 
         private bool IsAllUpper(string input)
         {
-            for (int i = 0; i < input.Length; i++)
+            for (var i = 0; i < input.Length; i++)
             {
                 if (Char.IsLetter(input[i]) && !Char.IsUpper(input[i]))
                     return false;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using HtmlAgilityPack;
@@ -15,13 +14,13 @@ namespace MvcApplication2.Controllers
     {
         public List<Update> GetUpdates(string url)
         {
-            List<Update> updates = new List<Update>();
-            UpdateTbl ut = new UpdateTbl();
-            
+            var updates = new List<Update>();
+            var ut = new UpdateTbl();
+
             url = "http://www.gaa.ie/modules/live_match.php?id=10830";
-            List<String> texts = new List<string>();
-            string time = "";
-            string score = "";
+            var texts = new List<string>();
+            var time = "";
+            var score = "";
             var web = new HtmlWeb();
             HtmlDocument doc;
             try
@@ -32,27 +31,30 @@ namespace MvcApplication2.Controllers
                 var nodes = doc.DocumentNode.SelectNodes("//div[@class='mt_updates']");
 
                 //var count = nodes.Count();
-                bool cont = true;
+                var cont = true;
                 foreach (var node in nodes)
                 {
                     cont = true;
                     time = WebUtility.HtmlDecode(node.ChildNodes[0].InnerText);
                     time = Regex.Replace(time,
-                        @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|<br>|</b>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>", "");
+                        @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|<br>|</b>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>",
+                        "");
 
                     var attr = node.ChildNodes;
                     foreach (var child in attr.Where(a => a.Name == "h4"))
                     {
                         score = WebUtility.HtmlDecode(child.InnerText);
                         score = Regex.Replace(score,
-                        @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|<br>|</b>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>", "");
+                            @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|<br>|</b>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>",
+                            "");
                     }
                     foreach (var child in attr.Where(a => a.Name == "p"))
                     {
-                        string text = "";
+                        var text = "";
                         text = WebUtility.HtmlDecode(child.InnerHtml);
                         text = Regex.Replace(text,
-                        @"\t|\r|<li>|</li>|<ul>|</ul>|<b>|<br>|</b>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>", "");
+                            @"\t|\r|<li>|</li>|<ul>|</ul>|<b>|<br>|</b>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>",
+                            "");
 
                         if (text == "") cont = false;
                         if (text.Contains("Preview")) cont = false;
@@ -62,9 +64,9 @@ namespace MvcApplication2.Controllers
                     }
                     if (texts.Count > 0)
                     {
-                        Update update = new Update();
+                        var update = new Update();
                         update.Text = new List<string>();
-                        foreach (string s in texts)
+                        foreach (var s in texts)
                         {
                             update.Text.Add(s);
                         }
@@ -78,9 +80,7 @@ namespace MvcApplication2.Controllers
                         score = "";
                         time = "";
                     }
-
                 }
-
             }
             catch (Exception ex)
             {

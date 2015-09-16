@@ -1,10 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Web.Http;
 using MvcApplication2.Models;
 using MySql.Data.MySqlClient;
@@ -14,32 +9,33 @@ namespace MvcApplication2.Controllers
     public class RoadwatchUserController : ApiController
     {
 #if DEBUG
-        private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
 #else
         private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
 #endif
         private static MySqlConnection _connection;
-        private bool _newUser = false;
-        string lastDate = "";
-        private int dayTotal = 0;
+        private bool _newUser;
+        private string lastDate = "";
+        private int dayTotal;
 
         // GET api/user
         public String Get(string id, string model)
         {
-            int i = 0;
-            bool updateTimes = false;
+            var i = 0;
+            var updateTimes = false;
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
-                
-                string query = string.Format("SELECT * from Roadwatch_Users where Unique_ID like '{0}';", id);
+
+                var query = string.Format("SELECT * from Roadwatch_Users where Unique_ID like '{0}';", id);
 
                 using (_connection)
                 {
                     _connection.Open();
                     using (var cmd = new MySqlCommand(query, _connection))
                     {
-                        using (MySqlDataReader r = cmd.ExecuteReader())
+                        using (var r = cmd.ExecuteReader())
                         {
                             if (!r.HasRows)
                             {
@@ -56,7 +52,7 @@ namespace MvcApplication2.Controllers
                         }
                     }
                 }
-                
+
                 if (updateTimes)
                 {
                     UpdateTimesUsed(i, id);
@@ -66,7 +62,8 @@ namespace MvcApplication2.Controllers
                 {
                     InsertUser(id, model);
                 }
-                if (id != "59AC8239E2CE2B6116A00549986CBBF58DB700D0" && id != "92A0CB490AFA78C63723C921090648D9050575B2" && id != "747B38EBCF294EA96067C8312455CAA7344C3ADB" && model != "Microsoft XDeviceEmulator")
+                if (id != "59AC8239E2CE2B6116A00549986CBBF58DB700D0" && id != "92A0CB490AFA78C63723C921090648D9050575B2" &&
+                    id != "747B38EBCF294EA96067C8312455CAA7344C3ADB" && model != "Microsoft XDeviceEmulator")
                 {
                     UpdateCountToday();
                 }
@@ -74,23 +71,24 @@ namespace MvcApplication2.Controllers
             catch (Exception ex)
             {
                 var sf = new StackFrame();
-                MethodBase methodBase = sf.GetMethod();
+                var methodBase = sf.GetMethod();
                 Database.InsertRoadwatchErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-            
+
             return "1120";
         }
 
         private void UpdateCountToday()
         {
-            int lastTotal = 0;
-            int count = GetCount();
+            var lastTotal = 0;
+            var count = GetCount();
             try
             {
                 if (count == 0)
                 {
                     count++;
-                    string query = "UPDATE RoadwatchUsersToday SET Count='" + count + "', Date='" + DateTime.Now.ToShortDateString() + "' WHERE Id = 1 ;";
+                    var query = "UPDATE RoadwatchUsersToday SET Count='" + count + "', Date='" +
+                                DateTime.Now.ToShortDateString() + "' WHERE Id = 1 ;";
 
                     using (_connection)
                     {
@@ -107,7 +105,7 @@ namespace MvcApplication2.Controllers
                         _connection.Open();
                         using (var cmd = new MySqlCommand(query, _connection))
                         {
-                            using (MySqlDataReader r = cmd.ExecuteReader())
+                            using (var r = cmd.ExecuteReader())
                             {
                                 while (r.Read())
                                 {
@@ -118,7 +116,8 @@ namespace MvcApplication2.Controllers
                     }
                     if (dayTotal > lastTotal)
                     {
-                        query = "UPDATE RoadwatchUsersToday SET Count='" + dayTotal + "', Date='" + lastDate + "' WHERE Id = 2 ;";
+                        query = "UPDATE RoadwatchUsersToday SET Count='" + dayTotal + "', Date='" + lastDate +
+                                "' WHERE Id = 2 ;";
                         using (_connection)
                         {
                             _connection.Open();
@@ -128,12 +127,11 @@ namespace MvcApplication2.Controllers
                             }
                         }
                     }
-                    
                 }
                 else
                 {
                     count++;
-                    string query = "UPDATE RoadwatchUsersToday SET Count='" + count + "' WHERE Id = 1 ;";
+                    var query = "UPDATE RoadwatchUsersToday SET Count='" + count + "' WHERE Id = 1 ;";
 
                     using (_connection)
                     {
@@ -141,35 +139,33 @@ namespace MvcApplication2.Controllers
                         using (var cmd = new MySqlCommand(query, _connection))
                         {
                             cmd.ExecuteNonQuery();
-                        }  
+                        }
                     }
-                    
                 }
-                
             }
             catch (Exception ex)
             {
                 var sf = new StackFrame();
-                MethodBase methodBase = sf.GetMethod();
+                var methodBase = sf.GetMethod();
                 Database.InsertRoadwatchErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
         }
 
         private int GetCount()
         {
-            int i = 0;
+            var i = 0;
             try
             {
                 _connection = new MySqlConnection(ConnectionString);
 
-                string query = "SELECT * from RoadwatchUsersToday Where Id = 1 ;";
+                var query = "SELECT * from RoadwatchUsersToday Where Id = 1 ;";
 
                 using (_connection)
                 {
                     _connection.Open();
                     using (var cmd = new MySqlCommand(query, _connection))
                     {
-                        using (MySqlDataReader r = cmd.ExecuteReader())
+                        using (var r = cmd.ExecuteReader())
                         {
                             while (r.Read())
                             {
@@ -179,12 +175,11 @@ namespace MvcApplication2.Controllers
                         }
                     }
                 }
-                
             }
             catch (Exception ex)
             {
                 var sf = new StackFrame();
-                MethodBase methodBase = sf.GetMethod();
+                var methodBase = sf.GetMethod();
                 Database.InsertRoadwatchErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
             dayTotal = i;
@@ -195,8 +190,8 @@ namespace MvcApplication2.Controllers
         {
             try
             {
-
-                string query = "UPDATE Roadwatch_Users SET Times_Used='" + i + "', Last_Used= '" + DateTime.Now.ToString() + "' WHERE Unique_ID = '" + id + "' ;";
+                var query = "UPDATE Roadwatch_Users SET Times_Used='" + i + "', Last_Used= '" + DateTime.Now +
+                            "' WHERE Unique_ID = '" + id + "' ;";
 
                 using (_connection)
                 {
@@ -206,7 +201,6 @@ namespace MvcApplication2.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-                
             }
             catch (Exception ex)
             {
@@ -220,7 +214,8 @@ namespace MvcApplication2.Controllers
         {
             try
             {
-                const string query = "INSERT INTO Roadwatch_Users (Unique_ID, Date_Entered, Model, Times_Used) VALUES (@id, @date, @model, @times);";
+                const string query =
+                    "INSERT INTO Roadwatch_Users (Unique_ID, Date_Entered, Model, Times_Used) VALUES (@id, @date, @model, @times);";
 
                 using (_connection)
                 {
@@ -237,7 +232,6 @@ namespace MvcApplication2.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-                
             }
             catch (Exception ex)
             {
@@ -245,7 +239,6 @@ namespace MvcApplication2.Controllers
                 var methodBase = sf.GetMethod();
                 Database.InsertRoadwatchErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-
         }
     }
 }

@@ -1,47 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Http;
-using MvcApplication2.Models;
 using HtmlAgilityPack;
+using MvcApplication2.Models;
 using MySql.Data.MySqlClient;
 
 namespace MvcApplication2.Controllers
 {
     public class GalleryController : ApiController
     {
-        #if DEBUG
-                private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
-        #else
+#if DEBUG
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+#else
                     private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
         #endif
-        MySqlConnection _connection;
-        readonly List<Gallery> _galleriesNotInDb = new List<Gallery>();
-        
+        private MySqlConnection _connection;
+        private readonly List<Gallery> _galleriesNotInDb = new List<Gallery>();
+
         // GET api/gallery
         public IEnumerable<Gallery> GetGalleries()
         {
             var galleries = new List<Gallery>();
-            
+
             try
             {
                 //Scrape galleries from site
-                
+
                 //galleries = ScrapeGalleries();
 
                 _connection = new MySqlConnection(ConnectionString);
                 _connection.Open();
-                
+
                 foreach (var g in galleries)
                 {
-                    string sql = string.Format("SELECT * from Gallery " +
-                        "where Title = '{0}' order by ID desc", g.Title);
+                    var sql = string.Format("SELECT * from Gallery " +
+                                            "where Title = '{0}' order by ID desc", g.Title);
 
                     using (var cmd = new MySqlCommand(sql, _connection))
                     {
@@ -51,7 +49,7 @@ namespace MvcApplication2.Controllers
                             {
                                 _galleriesNotInDb.Add(g);
                             }
-                        }   
+                        }
                     }
                 }
 
@@ -65,7 +63,6 @@ namespace MvcApplication2.Controllers
 
                 //Get all galleries new and old
                 galleries = GetAllGalleriesFromDb();
-
             }
             catch (Exception ex)
             {
@@ -95,8 +92,8 @@ namespace MvcApplication2.Controllers
                 var gallery2 = new Gallery();
                 var decodedString = WebUtility.HtmlDecode(node.ChildNodes[1].InnerText);
                 gallery2.Title = Regex.Replace(decodedString,
-                        @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|</b>|<br>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>", "");
-                
+                    @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|</b>|<br>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>", "");
+
                 gallery2.Img = "http://gaa.ie";
                 gallery2.Link = "http://gaa.ie";
                 galleries.Add(gallery2);
@@ -115,7 +112,8 @@ namespace MvcApplication2.Controllers
 
                     decodedString = WebUtility.HtmlDecode(nodeLi.InnerText);
                     gallery.Title = Regex.Replace(decodedString,
-                        @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|</b>|<br>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>", "");
+                        @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|</b>|<br>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>",
+                        "");
 
                     IEnumerable<HtmlAttribute> attr = nodeLi.ChildNodes[1].Attributes;
                     foreach (var attribute in attr.Where(attribute => attribute.Name == "href"))
@@ -135,7 +133,7 @@ namespace MvcApplication2.Controllers
 
         private static String GetTileImage(Gallery gallery)
         {
-            HtmlWeb web = new HtmlWeb();
+            var web = new HtmlWeb();
             var doc = web.Load(gallery.Link);
 
             var nodes = doc.DocumentNode.SelectNodes("//div[@id='gallery-slider']").Descendants();
@@ -148,7 +146,7 @@ namespace MvcApplication2.Controllers
                 //image.Abstract = Regex.Replace(decodedString,
                 //    @"\t|\n|\r", "");
                 //image.Abstract = Regex.Replace(image.Abstract,
-                 //   @"<span>|</span>", "\t\n");
+                //   @"<span>|</span>", "\t\n");
                 var attr = node.Attributes;
                 var first = (from a in attr where a.Name == "href" select a.Value).FirstOrDefault();
                 gallery.Tile = "http://gaa.ie" + first;
@@ -161,7 +159,7 @@ namespace MvcApplication2.Controllers
         private List<Gallery> GetAllGalleriesFromDb()
         {
             var galleries = new List<Gallery>();
-           
+
             try
             {
                 const string sql = "Select * from Gallery order by ID desc";
@@ -172,12 +170,12 @@ namespace MvcApplication2.Controllers
                         while (r.Read())
                         {
                             var g = new Gallery
-                                    {
-                                        Title = r.GetString("Title"),
-                                        Link = r.GetString("Link"),
-                                        Img = r.GetString("Image"),
-                                        Tile = r.GetString("Tile")
-                                    };
+                            {
+                                Title = r.GetString("Title"),
+                                Link = r.GetString("Link"),
+                                Img = r.GetString("Image"),
+                                Tile = r.GetString("Tile")
+                            };
                             galleries.Add(g);
                         }
                     }
@@ -189,7 +187,7 @@ namespace MvcApplication2.Controllers
                 var methodBase = stackFrame.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-            
+
             return galleries;
         }
 
@@ -197,7 +195,8 @@ namespace MvcApplication2.Controllers
         {
             try
             {
-                const string query = "INSERT INTO Gallery (Title, Link, Image, Tile) VALUES (@title, @link, @image, @tile);";
+                const string query =
+                    "INSERT INTO Gallery (Title, Link, Image, Tile) VALUES (@title, @link, @image, @tile);";
 
                 using (var cmd = new MySqlCommand(query, _connection))
                 {
@@ -217,8 +216,6 @@ namespace MvcApplication2.Controllers
                 var methodBase = sf.GetMethod();
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
-            
         }
-        
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using HtmlAgilityPack;
@@ -15,21 +12,22 @@ namespace MvcApplication2.Controllers
     public class ClubGround2Controller : ApiController
     {
 #if DEBUG
-        private const string ConnectionString = "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
+        private const string ConnectionString =
+            "SERVER=mysql2111.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
 #else
             private const string ConnectionString = "SERVER=mysql2111int.cp.blacknight.com;DATABASE=db1305421_wpdev;UID=u1305421_wpdev;PASSWORD=ggc12003/;PORT=3306;pooling=true;Convert Zero Datetime=true;";
 #endif
 
         public List<ClubGround> GetClubGroundByCounty(string county)
         {
-            List<ClubGround> clubGrounds = new List<ClubGround>();
+            var clubGrounds = new List<ClubGround>();
             MySqlConnection _connection;
             _connection = new MySqlConnection(ConnectionString);
 
             try
             {
                 _connection.Open();
-                string sql = "Select * from Club_Grounds where County = '" + county + "' order by Club_Ground";
+                var sql = "Select * from Club_Grounds where County = '" + county + "' order by Club_Ground";
 
                 using (var cmd = new MySqlCommand(sql, _connection))
                 {
@@ -38,20 +36,20 @@ namespace MvcApplication2.Controllers
                         while (r.Read())
                         {
                             var v = new ClubGround
-                                    {
-                                        Id = Convert.ToInt32(r.GetString("Id")),
-                                        Club_Ground = r.GetString("Club_Ground"),
-                                        County = county,
-                                        Latitude = r.GetString("Latitude"),
-                                        Longitude = r.GetString("Longitude"),
-                                        Club_Ground_2 = r.GetString("Club_Ground_2"),
-                                        Colours = r.GetString("Colours"),
-                                        Email = r.GetString("Email"),
-                                        Facebook = r.GetString("Facebook"),
-                                        Phone = r.GetString("Phone"),
-                                        Website = r.GetString("Website"),
-                                        Twitter = r.GetString("Twitter")
-                                    };
+                            {
+                                Id = Convert.ToInt32(r.GetString("Id")),
+                                Club_Ground = r.GetString("Club_Ground"),
+                                County = county,
+                                Latitude = r.GetString("Latitude"),
+                                Longitude = r.GetString("Longitude"),
+                                Club_Ground_2 = r.GetString("Club_Ground_2"),
+                                Colours = r.GetString("Colours"),
+                                Email = r.GetString("Email"),
+                                Facebook = r.GetString("Facebook"),
+                                Phone = r.GetString("Phone"),
+                                Website = r.GetString("Website"),
+                                Twitter = r.GetString("Twitter")
+                            };
                             clubGrounds.Add(v);
                         }
                     }
@@ -67,14 +65,14 @@ namespace MvcApplication2.Controllers
             {
                 _connection.Close();
             }
-            
+
             return clubGrounds;
         }
 
         [HttpGet]
         public String ScrapeClubGrounds(string county, string id)
         {
-            List<ClubGround> grounds = new List<ClubGround>();
+            var grounds = new List<ClubGround>();
             MySqlConnection _connection;
             _connection = new MySqlConnection(ConnectionString);
             var web = new HtmlWeb();
@@ -90,24 +88,24 @@ namespace MvcApplication2.Controllers
                     var attr = node.Attributes;
                     foreach (var at in attr.AttributesWithName("onclick"))
                     {
-                        string s = at.Value;
+                        var s = at.Value;
                         s = Regex.Match(s, @"\(([^;]*)\)").Groups[1].Value;
                         s = s.Replace("'", "");
                         var values = s.Split(',');
-                        ClubGround cg = new ClubGround
-                                        {
-                                            Club_Ground = values[0],
-                                            Club_Ground_2 = values[1],
-                                            Latitude = values[2],
-                                            Longitude = values[3],
-                                            Colours = values[4],
-                                            Website = values[5],
-                                            Facebook = values[6],
-                                            Twitter = values[7],
-                                            Email = values[8],
-                                            Phone = values[9],
-                                            County = county
-                                        };
+                        var cg = new ClubGround
+                        {
+                            Club_Ground = values[0],
+                            Club_Ground_2 = values[1],
+                            Latitude = values[2],
+                            Longitude = values[3],
+                            Colours = values[4],
+                            Website = values[5],
+                            Facebook = values[6],
+                            Twitter = values[7],
+                            Email = values[8],
+                            Phone = values[9],
+                            County = county
+                        };
                         grounds.Add(cg);
 
                         const string query =

@@ -1,12 +1,11 @@
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
-using MvcApplication2.Areas.HelpPage.Models;
 
 namespace MvcApplication2.Areas.HelpPage.Controllers
 {
     /// <summary>
-    /// The controller that will handle requests for the help page.
+    ///     The controller that will handle requests for the help page.
     /// </summary>
     public class HelpController : Controller
     {
@@ -20,7 +19,7 @@ namespace MvcApplication2.Areas.HelpPage.Controllers
             Configuration = config;
         }
 
-        public HttpConfiguration Configuration { get; private set; }
+        public HttpConfiguration Configuration { get; }
 
         public ActionResult Index()
         {
@@ -31,7 +30,7 @@ namespace MvcApplication2.Areas.HelpPage.Controllers
         {
             if (!String.IsNullOrEmpty(apiId))
             {
-                HelpPageApiModel apiModel = Configuration.GetHelpPageApiModel(apiId);
+                var apiModel = Configuration.GetHelpPageApiModel(apiId);
                 if (apiModel != null)
                 {
                     return View(apiModel);

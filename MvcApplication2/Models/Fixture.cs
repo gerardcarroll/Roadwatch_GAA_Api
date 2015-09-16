@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace MvcApplication2.Models
 {
@@ -19,7 +16,5 @@ namespace MvcApplication2.Models
         public bool ExtraTime { get; set; }
         public bool Replay { get; set; }
         public String Tv { get; set; }
-        //public string Team1_Crest { get; set; }
-        //public string Team2_Crest { get; set; }
     }
 }

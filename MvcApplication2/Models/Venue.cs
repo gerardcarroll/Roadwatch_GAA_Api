@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace MvcApplication2.Models
 {
@@ -14,6 +11,5 @@ namespace MvcApplication2.Models
         public String Longitude { get; set; }
         public String Name { get; set; }
         public String Town { get; set; }
-
     }
 }

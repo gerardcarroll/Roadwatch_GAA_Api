@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Cache;
-using System.Web;
 using System.Web.Mvc;
 using ImageResizer;
 using ImageResizer.Configuration;
@@ -27,20 +26,20 @@ namespace MvcApplication2.Controllers
 
         public FileResult LargeIcon()
         {
-            return Resize(336,691);
+            return Resize(336, 691);
         }
+
         private FileResult Resize(int height, int width)
         {
-            Article1 article1 = new Article1();
+            var article1 = new Article1();
 
-            string json = "";
-            
+            var json = "";
+
             try
             {
                 using (var client = new WebClient())
                 {
                     json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
-
                 }
                 json = json.Replace("@attributes", "attributes");
                 json = json.Remove(0, 11);
@@ -49,18 +48,18 @@ namespace MvcApplication2.Controllers
 
                 var q = (from a in articless
                     select a).OrderByDescending(a => a.upload_date).FirstOrDefault();
-                
-                Article art = q;
+
+                var art = q;
 
                 article1.title = WebUtility.HtmlDecode(art.title);
                 article1.filename = art.filename.Replace("http:", "");
 
                 var uri = "http:" + article1.filename;
-                var rsSettings = new ResizeSettings() { Format = "jpg", MaxHeight = height, MaxWidth = width };
+                var rsSettings = new ResizeSettings {Format = "jpg", MaxHeight = height, MaxWidth = width};
                 rsSettings.Anchor = ContentAlignment.TopCenter;
                 rsSettings.Mode = FitMode.Crop;
                 rsSettings.Scale = ScaleMode.Both;
-                Config c = Config.Current;
+                var c = Config.Current;
 
                 var wc = new WebClient
                 {
@@ -83,21 +82,19 @@ namespace MvcApplication2.Controllers
             }
 
             return null;
-
         }
 
         public String Heading()
         {
-            Article1 article1 = new Article1();
+            var article1 = new Article1();
 
-            string json = "";
-            
+            var json = "";
+
             try
             {
                 using (var client = new WebClient())
                 {
                     json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
-
                 }
                 json = json.Replace("@attributes", "attributes");
                 json = json.Remove(0, 11);
@@ -105,9 +102,9 @@ namespace MvcApplication2.Controllers
                 var articless = JsonConvert.DeserializeObject<List<Article>>(json);
 
                 var q = (from a in articless
-                         select a).OrderByDescending(a => a.upload_date).FirstOrDefault();
+                    select a).OrderByDescending(a => a.upload_date).FirstOrDefault();
 
-                Article art = q;
+                var art = q;
 
                 article1.title = WebUtility.HtmlDecode(art.title);
             }
@@ -119,7 +116,5 @@ namespace MvcApplication2.Controllers
             }
             return article1.title;
         }
-
-
     }
 }

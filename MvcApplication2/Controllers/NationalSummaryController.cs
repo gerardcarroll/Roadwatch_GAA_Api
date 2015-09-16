@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using HtmlAgilityPack;
@@ -15,13 +13,13 @@ namespace MvcApplication2.Controllers
     {
         public List<SummaryBlock> GetSummaryBlocks()
         {
-            List<SummaryBlock> blocks = new List<SummaryBlock>();
+            var blocks = new List<SummaryBlock>();
 
-            string decodedString = "";
-            string text = "";
+            var decodedString = "";
+            var text = "";
             var web = new HtmlWeb();
             const string link = "http://www.theaa.ie/AA/AA-Roadwatch.aspx";
-            
+
             try
             {
                 var doc = web.Load(link);
@@ -32,16 +30,16 @@ namespace MvcApplication2.Controllers
                 //SummaryBlock sb = new SummaryBlock();
                 foreach (var node in nodes)
                 {
-                    SummaryBlock sb = new SummaryBlock();
+                    var sb = new SummaryBlock();
                     //title
                     text = WebUtility.HtmlDecode(node.ChildNodes[1].InnerText);
                     decodedString = Regex.Replace(text,
                         @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|</b>|<em>|</em>|<u>|</u>|<strong>|</strong>|<p>|</p>", "");
                     sb.Title = decodedString;
 
-                    List<String> paraList = new List<String>();
+                    var paraList = new List<String>();
                     //para
-                    string d = "";
+                    var d = "";
                     if (node.ChildNodes[3].ChildNodes[1].InnerText != "&nbsp;")
                     {
                         d = WebUtility.HtmlDecode(node.ChildNodes[3].ChildNodes[1].InnerText);
@@ -74,7 +72,6 @@ namespace MvcApplication2.Controllers
                     sb.Paragraph = paraList;
                     blocks.Add(sb);
                 }
-
             }
             catch (Exception ex)
             {
@@ -84,6 +81,5 @@ namespace MvcApplication2.Controllers
             }
             return blocks;
         }
-        
     }
 }
