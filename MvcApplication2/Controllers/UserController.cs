@@ -76,7 +76,7 @@ namespace MvcApplication2.Controllers
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
 
-            return "1602";
+            return "1603";
         }
 
 
@@ -203,7 +203,7 @@ namespace MvcApplication2.Controllers
                 Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
 
-            return "1602";
+            return "1603";
         }
 
         private void InsertModel(string model, string id)
