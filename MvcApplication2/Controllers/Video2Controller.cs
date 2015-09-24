@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Http;
+using Google.Apis.Services;
+using Google.Apis.YouTube.v3;
 using MvcApplication2.Models;
 using Newtonsoft.Json;
 
@@ -16,31 +19,51 @@ namespace MvcApplication2.Controllers
             var videos = new List<Video2>();
             var json = "";
 
+            var channelId = "UCCsDOY9UaBpPnv60mxX6dQA";
+            var apiKey = "AIzaSyBVhdowoULpVYbhUMELZ3lHeKPvGWpNkcE";
+
             try
             {
-                using (var client = new WebClient())
-                {
-                    json =
-                        client.DownloadString(
-                            "http://gdata.youtube.com/feeds/api/videos?author=officialgaa&max-results=20&v=2&alt=jsonc&orderby=published");
-                }
+                YouTubeService yt = new YouTubeService(new BaseClientService.Initializer() { ApiKey = apiKey });
 
-                var obj = JsonConvert.DeserializeObject<Youtube>(json);
-                foreach (var vid in obj.Data.Items)
+                var searchListRequest = yt.Search.List("snippet");
+                searchListRequest.PublishedAfter = DateTime.Now.Subtract(new TimeSpan(30, 0, 0, 0, 0));
+                searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
+                searchListRequest.ChannelId = channelId;
+                searchListRequest.MaxResults = 30;
+                var searchListResult = searchListRequest.Execute();
+
+                videos.AddRange(searchListResult.Items.Select(item => new Video2()
                 {
-                    if (vid.Id != "UKY3scPIMd8")
-                    {
-                        var video2 = new Video2
-                        {
-                            Id = vid.Id,
-                            Description = Encode(vid.Description),
-                            Duration = vid.Duration.ToString(),
-                            Thumbnail = vid.Thumbnail.sqDefault,
-                            Title = Encode(vid.Title)
-                        };
-                        videos.Add(video2);
-                    }
-                }
+                    Id = item.Id.VideoId,
+                    Description = item.Snippet.Description,
+                    Thumbnail = item.Snippet.Thumbnails.High.Url,
+                    Title = item.Snippet.Title
+                }));
+
+                //using (var client = new WebClient())
+                //{
+                //    json =
+                //        client.DownloadString(
+                //            "http://gdata.youtube.com/feeds/api/videos?author=officialgaa&max-results=20&v=2&alt=jsonc&orderby=published");
+                //}
+
+                //var obj = JsonConvert.DeserializeObject<Youtube>(json);
+                //foreach (var vid in obj.Data.Items)
+                //{
+                //    if (vid.Id != "UKY3scPIMd8")
+                //    {
+                //        var video2 = new Video2
+                //        {
+                //            Id = vid.Id,
+                //            Description = Encode(vid.Description),
+                //            Duration = vid.Duration.ToString(),
+                //            Thumbnail = vid.Thumbnail.sqDefault,
+                //            Title = Encode(vid.Title)
+                //        };
+                //        videos.Add(video2);
+                //    }
+                //}
             }
             catch (Exception ex)
             {
