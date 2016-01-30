@@ -58,51 +58,60 @@ namespace MvcApplication2.Controllers
                 var articlesNotInDb = new List<Article1>();
                 var articlesInDb = new List<Article1>();
                 var json = "";
-                var newCode = "";
+                var newCode = "Published:";
 
                 using (var client = new WebClient())
                 {
                     json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
                 }
                 json = json.Replace("@attributes", "attributes");
-                json = json.Remove(0, 11);
+                json = json.Trim();
+                json = json.Remove(0, 12);
                 json = json.TrimEnd('}');
                 var articless = JsonConvert.DeserializeObject<List<Article>>(json);
 
 
                 foreach (var a in articless)
                 {
+                    if (a.url.Contains("http://www.gaa.iehttp://www.gaa.iehttp://www.gaa.ie"))
+                    {
+                        a.url = a.url.Remove(0, 34);
+                    }
+                    else if (a.url.Contains("http://www.gaa.iehttp://www.gaa.ie"))
+                    {
+                        a.url = a.url.Remove(0, 17);
+                    }
                     if (a.newsid != "12370")
                     {
-                        var isFootball = false;
-                        foreach (var sec in a.sections.section_id)
-                        {
-                            if (sec == "13")
-                            {
-                                newCode = "Camogie";
-                                break;
-                            }
-                            if (sec == "1")
-                            {
-                                newCode = "General";
-                                continue;
-                            }
-                            if (sec == "2")
-                            {
-                                newCode = "Football";
-                                isFootball = true;
-                                continue;
-                            }
-                            if (sec == "3" && isFootball)
-                            {
-                                newCode = "General";
-                                continue;
-                            }
-                            if (sec == "3")
-                            {
-                                newCode = "Hurling";
-                            }
-                        }
+                        //var isFootball = false;
+                        //foreach (var sec in a.sections.section_id)
+                        //{
+                        //    if (sec == "13")
+                        //    {
+                        //        newCode = "Camogie";
+                        //        break;
+                        //    }
+                        //    if (sec == "1")
+                        //    {
+                        //        newCode = "General";
+                        //        continue;
+                        //    }
+                        //    if (sec == "2")
+                        //    {
+                        //        newCode = "Football";
+                        //        isFootball = true;
+                        //        continue;
+                        //    }
+                        //    if (sec == "3" && isFootball)
+                        //    {
+                        //        newCode = "General";
+                        //        continue;
+                        //    }
+                        //    if (sec == "3")
+                        //    {
+                        //        newCode = "Hurling";
+                        //    }
+                        //}
                         a.filename = a.filename.Replace("http:", "");
                         if (a.title.StartsWith("LIVE:") || a.title.Contains("Live!") || a.title.Contains("LIVE!") ||
                             a.title.EndsWith("as it happens"))

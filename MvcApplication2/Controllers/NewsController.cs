@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using HtmlAgilityPack;
+using Microsoft.Ajax.Utilities;
 using MvcApplication2.Models;
 
 namespace MvcApplication2.Controllers
@@ -96,7 +97,10 @@ namespace MvcApplication2.Controllers
             var decodedString = "";
             var lastLine = "";
             var web = new HtmlWeb();
-            var link = url;
+
+            var link = "";
+            link = url.Contains("http://cdn.en.gaa.deltatre.nethttp") ? url.Remove(0, 30) : url;
+
             HtmlDocument doc;
             try
             {
@@ -117,7 +121,7 @@ namespace MvcApplication2.Controllers
                 {
                     HtmlAttributeCollection embedNodeAttributes = null;
                     var found = true;
-                    doc = web.Load(url);
+                    doc = web.Load(link);
                     try
                     {
                         embedNodeAttributes =
@@ -142,9 +146,10 @@ namespace MvcApplication2.Controllers
                     }
                 }
 
-                link = "http://gaa.ie/iphone/get_news_detail_html.php?article_id=" + id;
+                //link = "http://gaa.ie/iphone/get_news_detail_html.php?article_id=" + id;
                 doc = web.Load(link);
-                var nodes = doc.DocumentNode.SelectNodes("//p");
+                var nodes = doc.DocumentNode.SelectSingleNode("//div[@class='news-body']").ChildNodes;
+                //var nodes = doc.DocumentNode.SelectNodes("//p");
 
                 var count = nodes.Count();
 
@@ -168,12 +173,18 @@ namespace MvcApplication2.Controllers
                 }
                 else
                 {
-                    for (var i = 3; i < nodes.Count(); i++)
+                    for (var i = 0; i < nodes.Count(); i++)
                     {
                         text = WebUtility.HtmlDecode(nodes[i].InnerHtml);
-                        decodedString = Regex.Replace(text,
-                            @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|</b>|<em>|<em[^>]*>|</em>|<span[^>]*>|</span>|<u>|<u[^>]*>|</u>|<strong>|</strong>|<p>|</p>",
+                        decodedString = Regex.Replace(text.Trim(),
+                            @"\t|\n|\r|<li>|</li>|<ul>|</ul>|<b>|</b>|<em>|<em[^>]*>|</em>|<span[^>]*>|</span>|<u>|<u[^>]*>|</u>|<strong>|</strong>|<p>|</p>|<sup>|</sup>",
                             "");
+                        if (decodedString.Contains("<figure>"))
+                        {
+                            decodedString = Regex.Match(decodedString, "<img.*?data-srcset=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase).Groups[1].Value;
+                            decodedString = "<img src=\"http://www.gaa.ie" + decodedString + "\"><img>";
+                        }
+                        if (String.IsNullOrWhiteSpace(decodedString)) continue;
                         if (decodedString.Contains("[highlight")) continue;
                         if (decodedString.Contains("View tweet")) continue;
                         if (decodedString.Contains("<br>"))

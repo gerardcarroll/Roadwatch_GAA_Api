@@ -41,8 +41,12 @@ namespace MvcApplication2.Controllers
                 {
                     json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
                 }
+                //json = json.Replace("@attributes", "attributes");
+                //json = json.Remove(0, 11);
+                //json = json.TrimEnd('}');
                 json = json.Replace("@attributes", "attributes");
-                json = json.Remove(0, 11);
+                json = json.Trim();
+                json = json.Remove(0, 12);
                 json = json.TrimEnd('}');
                 var articless = JsonConvert.DeserializeObject<List<Article>>(json);
 
@@ -78,7 +82,7 @@ namespace MvcApplication2.Controllers
             {
                 var sf = new StackFrame();
                 var methodBase = sf.GetMethod();
-                Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
+                //Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
 
             return null;
@@ -96,8 +100,12 @@ namespace MvcApplication2.Controllers
                 {
                     json = client.DownloadString("http://www.gaa.ie/iphone/get_news_json.php");
                 }
+                //json = json.Replace("@attributes", "attributes");
+                //json = json.Remove(0, 11);
+                //json = json.TrimEnd('}');
                 json = json.Replace("@attributes", "attributes");
-                json = json.Remove(0, 11);
+                json = json.Trim();
+                json = json.Remove(0, 12);
                 json = json.TrimEnd('}');
                 var articless = JsonConvert.DeserializeObject<List<Article>>(json);
 
@@ -112,7 +120,7 @@ namespace MvcApplication2.Controllers
             {
                 var sf = new StackFrame();
                 var methodBase = sf.GetMethod();
-                Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
+                //Database.InsertErrorToDb(methodBase.Name, ex.Message, ex.ToString());
             }
             return article1.title;
         }

@@ -56,18 +56,18 @@ namespace MvcApplication2.Models
 
         private static void EmailError(string s1, string s2, string s3, string s4)
         {
-            var m = new MailMessage();
-            var SmtpServer = new SmtpClient("smtp1r.cp.blacknight.com");
-            m.From = new MailAddress("apierror@selectunes.eu");
-            m.To.Add("gcwpdev@gmail.com");
-            m.Subject = s4 + " Error; " + DateTime.Now;
-            m.Body = s1 + ";    " + s2 + ";     " + s3;
-            SmtpServer.Port = 587;
-            SmtpServer.Credentials = new NetworkCredential("apierror@selectunes.eu", "Ggc12003/");
-            SmtpServer.EnableSsl = true;
-            SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+            //var m = new MailMessage();
+            //var SmtpServer = new SmtpClient("smtp1r.cp.blacknight.com");
+            //m.From = new MailAddress("apierror@selectunes.eu");
+            //m.To.Add("gcwpdev@gmail.com");
+            //m.Subject = s4 + " Error; " + DateTime.Now;
+            //m.Body = s1 + ";    " + s2 + ";     " + s3;
+            //SmtpServer.Port = 587;
+            //SmtpServer.Credentials = new NetworkCredential("apierror@selectunes.eu", "Ggc12003/");
+            //SmtpServer.EnableSsl = true;
+            //SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
 
-            SmtpServer.Send(m);
+            //SmtpServer.Send(m);
         }
 
         public static void InsertRoadwatchErrorToDb(string p1, string p2, string p3)
