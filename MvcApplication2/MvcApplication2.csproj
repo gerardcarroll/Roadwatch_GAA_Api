@@ -74,7 +74,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack">
-      <HintPath>..\..\..\..\..\OneDrive\Bitbucket\Apps\MvcApplication2\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\..\..\..\OneDrive\Bitbucket\Apps\MvcApplication2\MvcApplication2\bin\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="ImageResizer">
       <HintPath>..\packages\ImageResizer.3.4.3\lib\ImageResizer.dll</HintPath>
@@ -323,6 +323,8 @@
     <Compile Include="Models\Image.cs" />
     <Compile Include="Models\Items.cs" />
     <Compile Include="Models\Junction.cs" />
+    <Compile Include="Models\LiveFeedData.cs" />
+    <Compile Include="Models\LiveMatchData.cs" />
     <Compile Include="Models\M7_eastBound.cs" />
     <Compile Include="Models\MatchTracker.cs" />
     <Compile Include="Models\model.cs" />

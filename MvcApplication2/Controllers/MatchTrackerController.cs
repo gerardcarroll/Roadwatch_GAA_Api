@@ -66,13 +66,14 @@ namespace MvcApplication2.Controllers
         public List<Update> GetUpdates(string url)
         {
             var updates = new List<Update>();
-            var ut = new UpdateTbl();
-            ut.Id = GetId().Id;
-            url = "http://www.gaa.ie/modules/live_match.php?id=" + ut.Id;
+            //var ut = new UpdateTbl();
+            //ut.Id = GetId().Id;
+            //url = "http://www.gaa.ie/modules/live_match.php?id=" + ut.Id;
             var texts = new List<string>();
             var time = "";
             var score = "";
             var web = new HtmlWeb();
+            string setupjson = "";
             HtmlDocument doc;
             try
             {
@@ -80,6 +81,39 @@ namespace MvcApplication2.Controllers
                 doc = web.Load(link);
 
                 var nodes = doc.DocumentNode.SelectNodes("//div[@class='mt_updates']");
+
+                var trackerDataLocNode = doc.DocumentNode.SelectSingleNode("//div[@id='liveblogging-app']").Attributes;
+
+                foreach (var attribute in trackerDataLocNode)
+                {
+                    if (attribute.Name == "ng-init")
+                    {
+                        setupjson = attribute.Value;
+                        setupjson = setupjson.Trim();
+                        setupjson = setupjson.Remove(0, 5);
+                        setupjson = setupjson.TrimEnd(')');
+                        break;
+                    }
+                }
+
+                if (setupjson != "")
+                {
+                    var liveMatchData = JsonConvert.DeserializeObject<LiveMatchData>(setupjson);
+
+                    if (liveMatchData != null)
+                    {
+                        string feedUrl = "http://www.gaa.ie" + liveMatchData.FeedPath;
+
+                        var feedJson = "";
+                        using (var client = new WebClient())
+                        {
+                            feedJson = client.DownloadString(feedUrl);
+                        }
+
+                        var feedData = JsonConvert.DeserializeObject<LiveFeedData>(feedJson);
+                    }
+                }
+
 
                 //var count = nodes.Count();
                 var cont = true;
