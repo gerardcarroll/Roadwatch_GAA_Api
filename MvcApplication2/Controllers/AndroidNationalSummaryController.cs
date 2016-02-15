@@ -3,40 +3,41 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using HtmlAgilityPack;
 using MvcApplication2.Models;
 
 namespace MvcApplication2.Controllers
 {
-    public class TestNationalSumController : ApiController
+    public class AndroidNationalSummaryController : ApiController
     {
-        public List<SummaryBlock> GetSummaryBlocks()
+        public List<AndroidSummaryBlock> GetSummaryBlocks()
         {
-            var blocks = new List<SummaryBlock>();
+            var blocks = new List<AndroidSummaryBlock>();
             var web = new HtmlWeb();
             const string link = "http://www.theaa.ie/AA/AA-Roadwatch.aspx";
             var d = "";
-            var para = "";
+            var placeUpdate = new PlaceUpdate();
             var updateTime = false;
             try
             {
                 var doc = web.Load(link);
                 var nodes = doc.DocumentNode.SelectNodes("//div[@class='mainTrafficReport']").Descendants();
-                var paraList = new List<String>();
-                var sb = new SummaryBlock();
-                foreach (  var node in nodes.Where(n => n.Name == "#text"))
+                var listOfPlaceUpdates = new List<PlaceUpdate>();
+                var sb = new AndroidSummaryBlock();
+                foreach (var node in nodes.Where(n => n.Name == "#text"))
                 {
                     var innerTrimmed = WebUtility.HtmlDecode(node.InnerText).Trim();
                     if (updateTime)
                     {
-                        sb = new SummaryBlock();
-                        sb.Title = innerTrimmed;
-                        paraList.Add("updated");
-                        sb.Paragraph = paraList;
-                        blocks.Add(sb);
-                        paraList = new List<string>();
-                        sb = new SummaryBlock();
+                        //sb = new AndroidSummaryBlock();
+                        //sb.Title = innerTrimmed;
+                        //paraList.Add("updated");
+                        //sb.Paragraph = paraList;
+                        //blocks.Add(sb);
+                        //paraList = new List<string>();
+                        //sb = new AndroidSummaryBlock();
                         updateTime = false;
                         continue;
                     }
@@ -49,13 +50,13 @@ namespace MvcApplication2.Controllers
                     {
                         if (sb.Title != null)
                         {
-                            paraList.Add(para);
-                            para = "";
-                            sb.Paragraph = paraList;
+                            listOfPlaceUpdates.Add(placeUpdate);
+                            placeUpdate = new PlaceUpdate();
+                            sb.Title = sb.Title;
                             blocks.Add(sb);
                         }
                         paraList = new List<string>();
-                        sb = new SummaryBlock();
+                        sb = new AndroidSummaryBlock();
                         sb.Title = "MAIN TRAFFIC";
                     }
                     else if (innerTrimmed == "CITY TRAFFIC" || innerTrimmed == "*CITY TRAFFIC*")
@@ -68,7 +69,7 @@ namespace MvcApplication2.Controllers
                             blocks.Add(sb);
                         }
 
-                        sb = new SummaryBlock();
+                        sb = new AndroidSummaryBlock();
                         sb.Title = "CITY TRAFFIC";
                         paraList = new List<string>();
                     }
@@ -82,7 +83,7 @@ namespace MvcApplication2.Controllers
                             blocks.Add(sb);
                         }
                         paraList = new List<string>();
-                        sb = new SummaryBlock();
+                        sb = new AndroidSummaryBlock();
                         sb.Title = "EVENTS";
                     }
                     else if (innerTrimmed == "ROADWORKS" || innerTrimmed == "*ROADWORKS*")
@@ -95,10 +96,10 @@ namespace MvcApplication2.Controllers
                             blocks.Add(sb);
                         }
                         paraList = new List<string>();
-                        sb = new SummaryBlock();
+                        sb = new AndroidSummaryBlock();
                         sb.Title = "ROADWORKS";
                     }
-                    else   if (innerTrimmed == "TRAVEL" || innerTrimmed == "*TRAVEL*")
+                    else if (innerTrimmed == "TRAVEL" || innerTrimmed == "*TRAVEL*")
                     {
                         if (sb.Title != null)
                         {
@@ -108,10 +109,10 @@ namespace MvcApplication2.Controllers
                             blocks.Add(sb);
                         }
                         paraList = new List<string>();
-                        sb = new SummaryBlock();
+                        sb = new AndroidSummaryBlock();
                         sb.Title = "TRAVEL";
                     }
-                    else                                   if (innerTrimmed == "ROAD CONDITIONS" || innerTrimmed == "*ROAD CONDITIONS*")
+                    else if (innerTrimmed == "ROAD CONDITIONS" || innerTrimmed == "*ROAD CONDITIONS*")
                     {
                         if (sb.Title != null)
                         {
@@ -121,7 +122,7 @@ namespace MvcApplication2.Controllers
                             blocks.Add(sb);
                         }
                         paraList = new List<string>();
-                        sb = new SummaryBlock();
+                        sb = new AndroidSummaryBlock();
                         sb.Title = "ROAD CONDITIONS";
                     }
                     else

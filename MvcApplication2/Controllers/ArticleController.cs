@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Serialization;
@@ -118,6 +119,9 @@ namespace MvcApplication2.Controllers
                         {
                             InsertUpdateToDb(a.newsid);
                         }
+
+                        byte[] bytes = Encoding.Default.GetBytes(a.title);
+                        a.title = Encoding.UTF8.GetString(bytes);
                         var article = new Article1
                         {
                             content_image_id = a.content_image_id,

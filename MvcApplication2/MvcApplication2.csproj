@@ -277,6 +277,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\AndroidNationalSummaryController.cs" />
     <Compile Include="Controllers\ArticleController.cs" />
     <Compile Include="Controllers\ClubGround2Controller.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
@@ -309,6 +310,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AndroidSummaryBlock.cs" />
     <Compile Include="Models\Article1.cs" />
     <Compile Include="Models\Camera.cs" />
     <Compile Include="Models\Carpark.cs" />
@@ -326,6 +328,7 @@
     <Compile Include="Models\LiveFeedData.cs" />
     <Compile Include="Models\LiveMatchData.cs" />
     <Compile Include="Models\M7_eastBound.cs" />
+    <Compile Include="Models\MatchData.cs" />
     <Compile Include="Models\MatchTracker.cs" />
     <Compile Include="Models\model.cs" />
     <Compile Include="Models\ParkingCity.cs" />

@@ -19,14 +19,14 @@ namespace MvcApplication2.Controllers
             {
                 //string xmlUrl =
                 //    "http://www.gaa.ie/iphone/feed_cache.php?includeClubGames=N&owner=1&reverseDateOrder=Y&dateFrom=" +
-                //    DateTime.Now.Subtract(new TimeSpan(30,0,0,0)).ToString("yyyyMMdd") + "&dateTo=" +
+                //    DateTime.Now.Subtract(new TimeSpan(30, 0, 0, 0)).ToString("yyyyMMdd") + "&dateTo=" +
                 //    DateTime.Now.AddDays(1).ToString("yyyyMMdd");
                 //XDocument resXml = XDocument.Load(xmlUrl);
 
                 //var xElement = resXml.Element("fixtures");
                 //if (xElement != null)
                 //    results = (from fixture1 in xElement.Element("fixture")
-                //                select new Result
+                //               select new Result
                 //               {
                 //                   CompName = fixture1.competition_name,
                 //                   Date = fixture1.date,
@@ -47,6 +47,7 @@ namespace MvcApplication2.Controllers
                 //                   Team_2_Points = fixture1.team_2_points
                 //               }).ToList();
 
+                var url = "http://www.gaa.ie/library/oldfeeds/feed_cache_json?fixturesOnly=Y&includeClubGames=N&owner=1&dateFrom=20160207&daysNext=31";
                 using (var client = new WebClient())
                 {
                     json =
@@ -76,8 +77,8 @@ namespace MvcApplication2.Controllers
                         Ref_Name = refname,
                         Replay = Convert.ToBoolean(fixture1.replay),
                         Team_1 = fixture1.club_1_name,
-                        Team_2 = fixture1.club_2_name,
-                        Venue = fixture1.venue_name,
+                        Team_2 = fixture1.club_2_name.ToString(),
+                        Venue = fixture1.venue_name.ToString(),
                         Time = fixture1.time,
                         Team1_Score = fixture1.team_1_goals + "-" + fixture1.team_1_points,
                         Team2_Score = fixture1.team_2_goals + "-" + fixture1.team_2_points,

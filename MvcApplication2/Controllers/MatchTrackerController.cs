@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using HtmlAgilityPack;
@@ -80,7 +81,7 @@ namespace MvcApplication2.Controllers
                 var link = url;
                 doc = web.Load(link);
 
-                var nodes = doc.DocumentNode.SelectNodes("//div[@class='mt_updates']");
+                //var nodes = doc.DocumentNode.SelectNodes("//div[@class='mt_updates']");
 
                 var trackerDataLocNode = doc.DocumentNode.SelectSingleNode("//div[@id='liveblogging-app']").Attributes;
 
@@ -103,18 +104,57 @@ namespace MvcApplication2.Controllers
                     if (liveMatchData != null)
                     {
                         string feedUrl = "http://www.gaa.ie" + liveMatchData.FeedPath;
+                        string matchDataUrl = "http://www.gaa.ie" + liveMatchData.MatchDataPath;
+
+                        var matchDataJson = "";
+                        using (var client = new WebClient())
+                        {
+                            matchDataJson = client.DownloadString(matchDataUrl);
+                        }
+
+                        var matchData = new MatchData();
+                        try
+                        {
+                            matchData = JsonConvert.DeserializeObject<MatchData>(matchDataJson);
+                        }
+                        catch (Exception){}
 
                         var feedJson = "";
+                        
                         using (var client = new WebClient())
                         {
                             feedJson = client.DownloadString(feedUrl);
                         }
 
                         var feedData = JsonConvert.DeserializeObject<LiveFeedData>(feedJson);
+                        
+                        for (int i = 1; i < feedData.Posts.Count; i++)
+                        {
+                            if (feedData.Posts[i].Text[0].TypeName == "TEXT")
+                            {
+                                string textLine = feedData.Posts[i].Text[0].text;
+                                byte[] bytes = Encoding.Default.GetBytes(textLine);
+                                textLine = Encoding.UTF8.GetString(bytes);
+                                Update update = new Update();
+                                if (textLine.Contains("@SetLabel"))
+                                {
+                                    string textLine1 = Regex.Match(textLine, "@SetLabel[('](.+?)[)'].*?]", RegexOptions.IgnoreCase).Groups[1].Value;
+                                    textLine = textLine1 + textLine.Substring(textLine.LastIndexOf(']') + 1);
+                                }
+                                else if (textLine.Contains("@SetMinute"))
+                                {
+                                    textLine = textLine.Substring(textLine.LastIndexOf(']') + 1);
+                                }
+                                update.Text = new List<string> { textLine };
+                                update.Time = DateTime.Parse(feedData.Posts[i].PostDate).ToString("h:mm tt");
+                                update.Score = matchData.HomeTeamOfficialName + " " + matchData.HomeTeamScore + " " + matchData.AwayTeamOfficialName + " " + matchData.AwayTeamScore;
+                                updates.Add(update);
+                            }
+                        }
                     }
                 }
 
-
+                /*
                 //var count = nodes.Count();
                 var cont = true;
                 foreach (var node in nodes)
@@ -176,7 +216,7 @@ namespace MvcApplication2.Controllers
                         score = "";
                         time = "";
                     }
-                }
+                }*/
             }
             catch (Exception ex)
             {

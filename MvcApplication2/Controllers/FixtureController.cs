@@ -16,9 +16,9 @@ namespace MvcApplication2.Controllers
             var date = DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)).ToString("yyyyMMdd");
             var json = "";
             var output = "";
-            var url =
-                "http://www.gaa.ie/iphone/feed_cache_json.php?fixturesOnly=Y&includeClubGames=N&owner=1&dateFrom=" +
-                date + "&daysNext=31";
+            //var url = "http://www.gaa.ie/iphone/feed_cache_json.php?fixturesOnly=Y&includeClubGames=N&owner=1&dateFrom=" + date + "&daysNext=31";
+
+            var url = "http://www.gaa.ie/library/oldfeeds/feed_cache_json?fixturesOnly=Y&includeClubGames=N&owner=1&dateFrom=20160207&daysNext=31";
 
             try
             {
@@ -65,9 +65,9 @@ namespace MvcApplication2.Controllers
                         Ref_Name = refname,
                         Replay = Convert.ToBoolean(fixture1.replay),
                         Team_1 = fixture1.club_1_name,
-                        Team_2 = fixture1.club_2_name,
+                        Team_2 = fixture1.club_2_name.ToString(),
                         Tv = tv,
-                        Venue = fixture1.venue_name,
+                        Venue = fixture1.venue_name.ToString(),
                         Time = fixture1.time
                     };
                     fixtures.Add(fix);

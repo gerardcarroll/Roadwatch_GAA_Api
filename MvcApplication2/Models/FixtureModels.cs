@@ -38,14 +38,14 @@ namespace MvcApplication2.Models
         public string club_1_name { get; set; }
         public string club_1_id { get; set; }
         public Team1Name team_1_name { get; set; }
-        public string club_2_name { get; set; }
+        public object club_2_name { get; set; }
         public string club_2_id { get; set; }
         public Team2Name team_2_name { get; set; }
         public string team_1_goals { get; set; }
         public string team_1_points { get; set; }
         public string team_2_goals { get; set; }
         public string team_2_points { get; set; }
-        public string venue_name { get; set; }
+        public object venue_name { get; set; }
         public string venue_id { get; set; }
         public object referee_surname { get; set; }
         public object referee_forename { get; set; }
@@ -67,6 +67,7 @@ namespace MvcApplication2.Models
         public string abandoned { get; set; }
         public string never_played { get; set; }
         public string owner { get; set; }
+        public object eventId { get; set; }
     }
 
     public class Fixtures
